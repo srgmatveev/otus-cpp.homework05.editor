@@ -13,7 +13,10 @@ public:
     virtual std::vector<std::shared_ptr<IShape>> get_objects() = 0;
     virtual void delete_selected() =0;
     virtual std::string get_caption()=0;
+    virtual void import_doc()=0;
+    virtual void export_doc()=0;
     virtual ~IDocument() = default;
+
 };
 
 
@@ -46,6 +49,14 @@ public:
     }
 
     std::string get_caption(){return _caption;}
+
+    void import_doc() override {
+        Logger::Instance().info("Open select import dialog window");
+    }
+    void export_doc() override {
+        Logger::Instance().info("Open select export dialog window");
+    }
+
 
     virtual ~Document() = default;
 private:

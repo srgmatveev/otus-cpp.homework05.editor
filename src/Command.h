@@ -66,6 +66,20 @@ protected:
     std::shared_ptr<IShape> _obj;
 };
 
+class selectTypeImportDocumentCommand:public Command{
+public:
+    selectTypeImportDocumentCommand(std::shared_ptr<IDocument> d)
+    : Command(d)  {
+    }
+
+    void execute() override {
+        if(document)
+            document->import_doc();
+    }
+
+    virtual ~selectTypeImportDocumentCommand() = default;
+};
+
 
 class importDocumentCommand: public Command {
 public:
@@ -87,6 +101,20 @@ std::unique_ptr<ImportDocument> _rule;
 std::shared_ptr<IShape> objects;
 };
 
+
+class selectTypeExportDocumentCommand:public Command{
+public:
+    selectTypeExportDocumentCommand(std::shared_ptr<IDocument> d)
+            : Command(d)  {
+    }
+
+    void execute() override {
+        if(document)
+            document->export_doc();
+    }
+
+    virtual ~selectTypeExportDocumentCommand() = default;
+};
 
 class exportDocumentCommand: public Command {
 public:
