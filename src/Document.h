@@ -5,31 +5,41 @@
 #include <vector>
 #include "utils.h"
 #include "Shapes.h"
+#include "Import_Export.h"
 
-Interface IDocument{
+Interface IDocument {
 public:
     virtual void init_on_create() = 0;
-    virtual void add_object(std::shared_ptr<IShape> ) = 0;
+
+    virtual void add_object(std::shared_ptr<IShape>) = 0;
+
     virtual std::vector<std::shared_ptr<IShape>> get_objects() = 0;
-    virtual void delete_selected() =0;
-    virtual std::string get_caption()=0;
-    virtual void import_doc()=0;
-    virtual void export_doc()=0;
+
+    virtual void delete_selected() = 0;
+
+    virtual std::string get_caption() = 0;
+
+    virtual void import_doc(std::unique_ptr<ImportDocument>) = 0;
+
+    virtual void export_doc(std::unique_ptr<IExportDocument>) = 0;
+
     virtual ~IDocument() = default;
 
 };
 
 
-class Document:public IDocument{
+class Document : public IDocument {
 public:
     /// Номер документа
     static size_t doc_counter;
     /// Номер объекта
     size_t obj_counter{0};
-    Document()= default;
-    void init_on_create(){
-            _caption = "new_document" + std::to_string(++Document::doc_counter)+ ".doc";
-            Logger::Instance().info("Create new vector document \"" + _caption + "\"");
+
+    Document() = default;
+
+    void init_on_create() {
+        _caption = "new_document" + std::to_string(++Document::doc_counter) + ".doc";
+        Logger::Instance().info("Create new vector document \"" + _caption + "\"");
     }
 
     void add_object(std::shared_ptr<IShape> obj) override {
@@ -42,113 +52,37 @@ public:
         return objects;
     }
 
-    void delete_selected(){
-        if(objects.size())  {
-            Logger::Instance().info(objects.at(objects.size()-1)->string_info(true));
-            objects.pop_back();}
+    void delete_selected() {
+        if (objects.size()) {
+            Logger::Instance().info(objects.at(objects.size() - 1)->string_info(true));
+            objects.pop_back();
+        }
     }
 
-    std::string get_caption(){return _caption;}
+    std::string get_caption() { return _caption; }
 
-    void import_doc() override {
-        Logger::Instance().info("Open select import dialog window");
-    }
-    void export_doc() override {
-        Logger::Instance().info("Open select export dialog window");
+    void import_doc(std::unique_ptr<ImportDocument> imp) override {
+        Logger::Instance().info("Begin import to " + _caption + " ...");
+
+        for ( auto &i : imp->Import_from_Document())
+            add_object(i);
+
+        Logger::Instance().info("End import to " + _caption + " ...");
     }
 
+    void export_doc(std::unique_ptr<IExportDocument> exp) override {
+        Logger::Instance().info("Begin export " + _caption + " to " + exp->get_doc_name() + " ...");
+        exp->ExportToDocument(objects);
+        Logger::Instance().info("End export " + _caption + " to " + exp->get_doc_name() + " ...");
+    }
 
     virtual ~Document() = default;
+
 private:
     std::string _caption{};
     std::vector<std::shared_ptr<IShape>> objects{};
 };
 
-size_t Document::doc_counter=0;
+size_t Document::doc_counter = 0;
 
 
-Interface ImportDocument{
-public:
-    virtual  std::vector<std::shared_ptr<IShape>> Import_from_Document() = 0;
-    virtual ~ImportDocument() = default;
-};
-
-
-class ImportFromFileSystem:public ImportDocument{
-public:
-    ImportFromFileSystem(const std::string &file_name):ImportDocument(), _file_name(file_name){}
-    std::vector<std::shared_ptr<IShape>> Import_from_Document() override {
-        Logger::Instance().info("Import from filesystem file " + _file_name);
-        std::vector<std::shared_ptr<IShape>> shapes{};
-        std::shared_ptr<IShape> circle = std::make_shared<Circle>(Point{1,8},2);
-        shapes.emplace_back(circle);
-        return shapes;
-    }
-    ~ImportFromFileSystem() override = default;
-
-private:
-    std::string _file_name{};
-};
-
-class ImportFromSQLDatabase:public ImportDocument{
-public:
-    ImportFromSQLDatabase(const std::string &db_name, const std::string& connect_string):ImportDocument(), _db_name(db_name),
-    _connect_string(connect_string){
-        Logger::Instance().info("Try connect to Database with connect string " + _connect_string );
-        Logger::Instance().info("Connect to Database " + _db_name + " successful");
-    }
-    std::vector<std::shared_ptr<IShape>> Import_from_Document() override {
-        Logger::Instance().info("Import from Database " + _db_name);
-        std::vector<std::shared_ptr<IShape>> shapes{};
-        std::shared_ptr<IShape> circle = std::make_shared<Circle>(Point{1,8},2);
-        shapes.emplace_back(circle);
-        return shapes;
-    }
-    ~ImportFromSQLDatabase() override = default;
-
-private:
-    std::string _db_name{};
-    std::string _connect_string{};
-};
-
-
-Interface IExportDocument{
-public:
-    virtual  void ExportToDocument(const std::vector<std::shared_ptr<IShape>>&) = 0;
-    virtual ~IExportDocument() = default;
-    virtual std::string get_doc_name() = 0;
-};
-
-class ExportToFile:public IExportDocument{
-public:
-    ExportToFile(const std::string &file_name):IExportDocument(),  _file_name(file_name){}
-    void ExportToDocument(const std::vector<std::shared_ptr<IShape>>& vec) override {
-        for(auto&i : vec) {
-            Logger::Instance().info("Export shape");
-        }
-    }
-    ~ExportToFile() override = default;
-
-    std::string get_doc_name() {return _file_name;}
-private:
-      std::string _file_name{};
-};
-
-
-class ExportToSQLDatabase:public IExportDocument{
-public:
-    ExportToSQLDatabase(const std::string& DB_name,
-            const std::string& connection_name):IExportDocument(),  _DB_name(DB_name),
-                                                _connection_name(connection_name){}
-    void ExportToDocument(const std::vector<std::shared_ptr<IShape>>& vec) override {
-        for(auto&i : vec) {
-            Logger::Instance().info("Export shape");
-        }
-    }
-    ~ExportToSQLDatabase() override = default;
-
-    std::string get_doc_name() {return _DB_name;}
-private:
-    std::string _DB_name{};
-    std::string _connection_name{};
-};

@@ -3,6 +3,7 @@
 #include "Command.h"
 #include "Shapes.h"
 
+
 int main() {
     std::shared_ptr<IDocument> new_doc = std::make_shared<Document>();
     D_C::instance().Dispatcher(std::make_unique<newDocumentCommand>(new_doc));
@@ -21,20 +22,22 @@ int main() {
 
     std::shared_ptr<IDocument> new_doc1 = std::make_shared<Document>();
     D_C::instance().Dispatcher(std::make_unique<newDocumentCommand>(new_doc1));
-    D_C::instance().Dispatcher(std::make_unique<selectTypeImportDocumentCommand>(new_doc1));
-    std::unique_ptr<ImportDocument> rule = std::make_unique<ImportFromFileSystem>("file.ai");
-    D_C::instance().Dispatcher(std::make_unique<importDocumentCommand>(new_doc1, std::move(rule)));
+
+    std::unique_ptr<ImportDocument> imp_rule1 = std::make_unique<ImportFromFileSystem>("file.ai");
+    D_C::instance().Dispatcher(std::make_unique<importDocumentCommand>(new_doc1, std::move(imp_rule1)));
     D_C::instance().runCommands();
 
-    D_C::instance().Dispatcher(std::make_unique<selectTypeImportDocumentCommand>(new_doc1));
-    std::unique_ptr<ImportDocument> rule1 = std::make_unique<ImportFromSQLDatabase>("shapes.mdf",
-                                                                                    "//MSSQLServer:\"db_user\":\"password\"@shapes.mdf");
-    D_C::instance().Dispatcher(std::make_unique<importDocumentCommand>(new_doc1, std::move(rule1)));
+    std::unique_ptr<ImportDocument> imp_rule2 = std::make_unique<ImportFromSQLDatabase>("shapes.mdf",
+                                                                                   "//MSSQLServer:\"db_user\":\"password\"@shapes.mdf");
+    D_C::instance().Dispatcher(std::make_unique<importDocumentCommand>(new_doc1, std::move(imp_rule2)));
     D_C::instance().runCommands();
 
+    std::unique_ptr<IExportDocument> exp_rule1 = std::make_unique<ExportToFile>("file.ai");
+    D_C::instance().Dispatcher(std::make_unique<exportDocumentCommand>(new_doc1, std::move(exp_rule1)));
+    D_C::instance().runCommands();
 
-    D_C::instance().Dispatcher(std::make_unique<selectTypeExportDocumentCommand>(new_doc1));
-    std::unique_ptr<IExportDocument> exp_rule = std::make_unique<ExportToFile>("romashka.ai");
-    D_C::instance().Dispatcher(std::make_unique<exportDocumentCommand>(new_doc1, std::move(exp_rule)));
+    std::unique_ptr<IExportDocument> exp_rule2 = std::make_unique<ExportToSQLDatabase>("exp_shapes.mdf",
+                                                                                                 "//MSSQLServer:\"db_user\":\"password\"@exp_shapes.mdf");
+    D_C::instance().Dispatcher(std::make_unique<exportDocumentCommand>(new_doc1, std::move(exp_rule2)));
     D_C::instance().runCommands();
 }
