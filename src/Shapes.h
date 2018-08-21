@@ -21,13 +21,7 @@ public:
     virtual std::string string_info(bool) = 0;
     /// Виртуальный деструктор
     virtual ~IShape(){};
-    /// Получить тип графического объекта
-    virtual std::string get_name()=0;
-    /// Получить номер графического объекта
-    virtual size_t get_id() =0;
-    /// Присвоить номер графическому объекту
-    virtual void set_id(const size_t&)=0;
-};
+   };
 
 /**
  * @brief Структура для хранения 2D координат точки
@@ -55,7 +49,7 @@ public:
         Logger::Instance().info(string_info());
     }
     /// Виртуальный деструктор
-    ~Line() override {}
+    virtual ~Line(){}
     /// Метод, выводящий информацию о линии
     std::string string_info(bool del_flag = false) override {
         std::ostringstream stream;
@@ -63,24 +57,13 @@ public:
         else stream << "Draw ";
         stream << "line from x = " << _begin._x << " y = " << _begin._y;
         stream << " to x = " << _end._x << " y = " << _end._y;
-        stream << " with id = " << shape_id;
         return stream.str();
     }
-    /// Метод, возвращающий тип объекта
-    std::string get_name() override {return type;}
-    /// Метод, возвращающий id объекта
-    size_t get_id() {return shape_id;}
-    /// Присвоить номер id графическому объекту
-    void set_id(const size_t& id) override {shape_id =id;}
 private:
     /// Структура, задающая начало линии
     Point _begin;
     /// Структура, задающая конец линии
     Point _end;
-    /// тип объекта
-    std::string type{"Line"};
-    /// id объекта
-    size_t shape_id{0};
 };
 /**
  * @brief  Класс, рисующий прямоугольник 2D
@@ -88,14 +71,14 @@ private:
 class Rectangle : public IShape {
 public:
     /// Конструктор, задающий координаты вершины, длину, ширину и угол поворота прямоугольника
-    Rectangle(const Point &top, const size_t &height, const size_t &width, const __uint16_t &rotate = 0) :
+    Rectangle(const Point &top, const size_t &height, const size_t &width, const uint16_t &rotate = 0) :
             _top(top), _height(height), _width(width), _angle(rotate) {}
     /// Реализация метода для отображения прямоугольника на Canvas
     void draw() override {
         Logger::Instance().info(string_info());
     }
     /// Виртуальный деструктор
-    ~Rectangle() override {}
+    virtual ~Rectangle() {}
     /// Метод, выводящий информацию о прямоугольнике
     std::string string_info(bool del_flag = false) override {
         std::ostringstream stream;
@@ -104,15 +87,8 @@ public:
         stream << "rectangle from top {" << _top._x << ", " << _top._y << "} ";
         stream << " with height = " << _height << " width = " << _width;
         stream << " and rotate angle = " << _angle;
-        stream << " with id = " << shape_id;
         return stream.str();
     }
-    /// Метод, возвращающий тип объекта
-    std::string get_name() override {return type;}
-    /// Метод, возвращающий id объекта
-    size_t get_id() {return shape_id;}
-    /// Присвоить номер id графическому объекту
-    void set_id(const size_t& id) override {shape_id =id;}
 private:
     /// Структура, задающая вершину прямоугольника
     Point _top{0, 0};
@@ -121,11 +97,7 @@ private:
     /// Ширина прямоугольника
     size_t _width{0};
     /// Угол поворота прямоугольника
-    __uint16_t _angle{0};
-    /// тип объекта
-    std::string type{"Rectangle"};
-    /// id объекта
-    size_t shape_id{0};
+    uint16_t _angle{0};  
 };
 /**
  * @brief  Класс, рисующий окружность 2D
@@ -139,7 +111,7 @@ public:
         Logger::Instance().info(string_info());
     }
     /// Виртуальный деструктор
-    ~Circle() override {}
+    virtual ~Circle() {}
     /// Метод, выводящий информацию об окружности
     std::string string_info(bool del_flag = false) override {
         std::ostringstream stream;
@@ -147,22 +119,11 @@ public:
         else stream << "Draw ";
         stream << "circle with center at  x = " << _center._x << " y = " << _center._y;
         stream << " with radius = " << _radius;
-        stream << " with id = " << shape_id;
         return stream.str();
     }
-/// Метод, возвращающий тип объекта
-    std::string get_name() override {return type;}
-    /// Метод, возвращающий id объекта
-    size_t get_id() {return shape_id;}
-    /// Присвоить номер id графическому объекту
-    void set_id(const size_t& id) override {shape_id =id;}
 private:
     /// Структура, задающая центр окружности
     Point _center;
     /// Радиус окружности
     size_t _radius;
-    /// тип объекта
-    std::string type{"Circle"};
-    /// id объекта
-    size_t shape_id{0};
 };

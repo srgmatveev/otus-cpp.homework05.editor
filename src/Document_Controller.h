@@ -39,7 +39,8 @@ private:
     D_C(D_C &&rhs) = delete;
 
     D_C &operator=(const D_C &) = delete;
-
+/// Оператор перемещающего присваивания запрещен
+    D_C&& operator = (D_C &&) = delete;
 
     std::list<std::unique_ptr<ICommand>> commandQueue;
 };

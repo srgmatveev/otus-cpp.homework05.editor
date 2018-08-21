@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.7)
 set(VERSION_MAJOR 0)
 set(VERSION_MINOR 0)
 set(VERSION_PATCH 1)
@@ -12,8 +12,8 @@ project(${MY_PROJECT_NAME} VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_P
 set(SRC_DIR "./src")
 include_directories(${SRC_DIR})
 
-set(SOURCE_FILES main.cpp)
-add_executable(${MY_PROJECT_NAME} ${SOURCE_FILES})
+set(MY_SOURCE_FILES main.cpp)
+add_executable(${MY_PROJECT_NAME} ${MY_SOURCE_FILES})
 
 set_target_properties(${MY_PROJECT_NAME}  PROPERTIES
         CXX_STANDARD 14

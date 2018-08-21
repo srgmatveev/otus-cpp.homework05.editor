@@ -11,7 +11,7 @@ Interface IDocument {
 public:
     virtual void init_on_create() = 0;
 
-    virtual void add_object(std::shared_ptr<IShape>) = 0;
+    virtual void add_object(std::shared_ptr<IShape>&) = 0;
 
     virtual std::vector<std::shared_ptr<IShape>> get_objects() = 0;
 
@@ -32,9 +32,7 @@ class Document : public IDocument {
 public:
     /// Номер документа
     static size_t doc_counter;
-    /// Номер объекта
-    size_t obj_counter{0};
-
+    
     Document() = default;
 
     void init_on_create() {
@@ -42,9 +40,8 @@ public:
         Logger::Instance().info("Create new vector document \"" + _caption + "\"");
     }
 
-    void add_object(std::shared_ptr<IShape> obj) override {
+    void add_object(std::shared_ptr<IShape>& obj) override {
         objects.emplace_back(obj);
-        obj->set_id(++obj_counter);
         obj->draw();
     }
 

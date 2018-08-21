@@ -17,6 +17,13 @@ public:
         activeDocument = doc;
     }
 
+std::shared_ptr<IDocument> getActiveDocument() const {
+    return activeDocument;
+}
+
+void setActiveDocument(std::shared_ptr<IDocument>& actDoc_ptr){
+    activeDocument = actDoc_ptr;
+ }
 private:
     /// Конструктор по умолчанию
     Documents() = default;
@@ -28,7 +35,9 @@ private:
     Documents(Documents &&ths) = delete;
 
     /// Оператор присваивания запрещен
-    Documents &operator=(const Documents &) = delete;
+    Documents& operator=(const Documents &) = delete;
+    /// Оператор перемещающего присваивания запрещен
+    Documents&& operator = (Documents &&) = delete;
     std::shared_ptr<IDocument> activeDocument;
     std::vector<std::shared_ptr<IDocument>> documents{};
 };
